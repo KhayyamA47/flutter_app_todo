@@ -5,6 +5,8 @@ import 'package:flutter_app_todo/Screens/daily_screens/daily_detail.dart';
 import 'package:flutter_app_todo/Utils/daily_database_helper.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
+import 'package:date_format/date_format.dart';
 
 void main() {
   runApp(TodoApp());
@@ -48,11 +50,7 @@ class TodoListState extends State<DailyList> {
       appBar: AppBar(
         title: Text('Todos'),
       ),
-      body: Column(
-        children: <Widget>[
-          getTodoListView(),
-        ],
-      ),
+      body: getTodoListView(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
@@ -61,6 +59,94 @@ class TodoListState extends State<DailyList> {
         tooltip: 'Add Todo',
         child: Icon(Icons.add),
       ),
+    );
+  }
+
+  String getDate(String date) {
+    DateTime d = DateTime.parse(date);
+
+    var formatter = new DateFormat('dd.MM.yyyy');
+    String formatted = formatter.format(d);
+    return formatted;
+  }
+
+  String getTime(String date) {
+    DateTime d = DateTime.parse(date);
+
+    var formatter = new DateFormat('HH:mm');
+    String formatted = formatter.format(d);
+    return formatted;
+  }
+
+  bool checkTime(String date) {
+    DateTime d = DateTime.parse(date);
+
+    final date2 = DateTime.now();
+
+    int diffTime = d.difference(date2).inMinutes;
+    bool isSame = (diffTime > 0);
+    return isSame;
+  }
+
+  Widget listViewItems(int position) {
+    checkTime(this.todoList[position].date);
+    return Row(
+      children: <Widget>[
+        CircleAvatar(
+          backgroundColor: getPriorityColor(this.todoList[position].priority),
+          child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
+        ),
+        Flexible(
+            child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Flexible(
+                child: Container(
+              margin: EdgeInsets.only(left: 10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Flexible(
+                    child: Text(
+                      this.todoList[position].title,
+                      style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold, decoration: TextDecoration.lineThrough, decorationThickness: 3.0),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Flexible(
+                    child: Text(
+                      this.todoList[position].description,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+//                  ),
+
+//                  Text(this.todoList[position].title, style: TextStyle(fontSize :19.0,fontWeight: FontWeight.bold,decoration:
+//                  TextDecoration.lineThrough,decorationThickness: 3.0)),
+//                  Text(this.todoList[position].description),
+                  )
+                ],
+              ),
+            )),
+            Container(
+                alignment: Alignment.bottomRight,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Text(
+                      getDate(this.todoList[position].date),
+                      style: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic),
+                    ),
+                    Text(
+                      getTime(this.todoList[position].date),
+                      style: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic),
+                    ),
+                  ],
+                ))
+          ],
+        ))
+      ],
     );
   }
 
@@ -73,25 +159,13 @@ class TodoListState extends State<DailyList> {
         return Slidable(
           actionPane: SlidableDrawerActionPane(),
           actionExtentRatio: 0.25,
-          child: Card(
-            elevation: 3.0,
-            color: Colors.white,
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: getPriorityColor(this.todoList[position].priority),
-                child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
-              ),
-              title: Text(this.todoList[position].title, style: TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(this.todoList[position].description),
-
-            ),
-          ),
+          child: Container(height: 80.0, child: Card(elevation: 3.0, color: Colors.white, child: listViewItems(position))),
           actions: <Widget>[
             IconSlideAction(
               caption: 'Update',
               color: Colors.indigo,
               icon: Icons.update,
-              onTap: ()  {
+              onTap: () {
                 navigateToDetail(this.todoList[position], 'Edit Todo');
               },
             ),
@@ -101,7 +175,7 @@ class TodoListState extends State<DailyList> {
               caption: 'Delete',
               color: Colors.red,
               icon: Icons.delete,
-              onTap:  () {
+              onTap: () {
                 _delete(context, todoList[position]);
               },
             ),
@@ -168,92 +242,5 @@ class TodoListState extends State<DailyList> {
         });
       });
     });
-  }
-}
-
-class SlideMenu extends StatefulWidget {
-  final Widget child;
-  final List<Widget> menuItems;
-
-  SlideMenu({this.child, this.menuItems});
-
-  @override
-  _SlideMenuState createState() => new _SlideMenuState();
-}
-
-class _SlideMenuState extends State<SlideMenu> with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-
-  @override
-  initState() {
-    super.initState();
-    _controller = new AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
-  }
-
-  @override
-  dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final animation =
-        new Tween(begin: const Offset(0.0, 0.0), end: const Offset(-0.2, 0.0)).animate(new CurveTween(curve: Curves.decelerate).animate(_controller));
-
-    return new GestureDetector(
-      onHorizontalDragUpdate: (data) {
-        // we can access context.size here
-        setState(() {
-          _controller.value -= data.primaryDelta / context.size.width;
-        });
-      },
-      onHorizontalDragEnd: (data) {
-        if (data.primaryVelocity > 2500)
-          _controller.animateTo(.0);
-        else if (_controller.value >= .5 || data.primaryVelocity < -2500)
-          _controller.animateTo(1.0);
-        else
-          _controller.animateTo(.0);
-      },
-      child: new Stack(
-        children: <Widget>[
-          new SlideTransition(position: animation, child: widget.child),
-          new Positioned.fill(
-            child: new LayoutBuilder(
-              builder: (context, constraint) {
-                return new AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child) {
-                    return new Stack(
-                      children: <Widget>[
-                        new Positioned(
-                          right: .0,
-                          top: .0,
-                          bottom: .0,
-                          width: constraint.maxWidth * animation.value.dx * -2,
-                          child: new Container(
-                            margin: EdgeInsets.only(top: 8.0),
-                            height: MediaQuery.of(context).size.height / 10,
-                            color: Colors.white,
-                            child: new Row(
-                              children: widget.menuItems.map((child) {
-                                return new Expanded(
-                                  child: child,
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-            ),
-          )
-        ],
-      ),
-    );
   }
 }
