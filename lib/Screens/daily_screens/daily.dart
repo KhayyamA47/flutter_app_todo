@@ -92,17 +92,22 @@ class TodoListState extends State<DailyList> {
     checkTime(this.todoList[position].date);
     return Row(
       children: <Widget>[
-        CircleAvatar(
-          backgroundColor: getPriorityColor(this.todoList[position].priority),
-          child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
+
+        Container(
+          margin: EdgeInsets.only(left: 8.0,right: 8.0),
+          child:  CircleAvatar(
+            backgroundColor: getPriorityColor(this.todoList[position].priority),
+            child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
+          ),
         ),
+
         Flexible(
             child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Flexible(
                 child: Container(
-              margin: EdgeInsets.only(left: 10.0),
+              margin: EdgeInsets.only( right: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,24 +117,24 @@ class TodoListState extends State<DailyList> {
                       this.todoList[position].title,
                       style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold, decoration: TextDecoration.lineThrough, decorationThickness: 3.0),
                       overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      maxLines: 2,
                     ),
                   ),
                   Flexible(
+                      child: Container(
                     child: Text(
                       this.todoList[position].description,
                       overflow: TextOverflow.ellipsis,
+                      softWrap: false,
+                      maxLines: 2,
                     ),
-
-//                  ),
-
-//                  Text(this.todoList[position].title, style: TextStyle(fontSize :19.0,fontWeight: FontWeight.bold,decoration:
-//                  TextDecoration.lineThrough,decorationThickness: 3.0)),
-//                  Text(this.todoList[position].description),
-                  )
+                  ))
                 ],
               ),
             )),
             Container(
+              margin: EdgeInsets.only(right: 8.0),
                 alignment: Alignment.bottomRight,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,

@@ -35,6 +35,7 @@ class TodoDetailState extends State<TodoDetail> {
   List<String> periodItems = ['Daily', 'Weekly', 'Monthly'];
   String priorityValue = 'Low';
   List<String> priorityItems = ['Low', 'Medium', 'High'];
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TodoDetailState(this.todo, this.appBarTitle);
 
@@ -51,6 +52,7 @@ class TodoDetailState extends State<TodoDetail> {
           moveToLastScreen();
         },
         child: Scaffold(
+          key: _scaffoldKey,
           appBar: AppBar(
             title: Text(appBarTitle),
             leading: IconButton(
@@ -141,8 +143,19 @@ class TodoDetailState extends State<TodoDetail> {
                           ),
                           onPressed: () {
                             setState(() {
-                              debugPrint("Save button clicked");
-                              _save();
+                              print(" button clicked ${titleController.text}");
+
+                              if (titleController.text != null &&
+                                  titleController.text != '' &&
+                                  descriptionController.text != null &&
+                                  descriptionController.text != '' &&
+                                  BasicDateTimeField.resultTime != null &&
+                                  BasicDateTimeField.resultTime != '') {
+                                print("Save button clicked");
+                                _save();
+                              }else{
+                                _displaySnackBar(context);
+                              }
                             });
                           },
                         ),
@@ -189,9 +202,12 @@ class TodoDetailState extends State<TodoDetail> {
     todo.description = descriptionController.text;
   }
 
+  _displaySnackBar(BuildContext context) {
+    final snackBar = SnackBar(content: Text('Please,fill all boxes'));
+    _scaffoldKey.currentState.showSnackBar(snackBar);
+  }
   // Save data to database
   void _save() async {
-
     moveToLastScreen();
 
     todo.date = BasicDateTimeField.resultTime.toString();
