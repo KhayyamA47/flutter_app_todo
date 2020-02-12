@@ -1,37 +1,36 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_todo/Models/todo.dart';
-import 'package:flutter_app_todo/Utils/database_helper.dart';
+import 'package:flutter_app_todo/Models/weeklyTodo.dart';
+import 'package:flutter_app_todo/Utils/weekly_database_helper.dart';
 
 import 'package:intl/intl.dart';
 
-class TodoDetail extends StatefulWidget {
+class WeeklyDetail extends StatefulWidget {
 
 	final String appBarTitle;
-	final Todo todo;
+	final Weekly todo;
 
-	TodoDetail(this.todo, this.appBarTitle);
+	WeeklyDetail(this.todo, this.appBarTitle);
 
 	@override
   State<StatefulWidget> createState() {
 
-    return TodoDetailState(this.todo, this.appBarTitle);
+    return WeeklyDetailState(this.todo, this.appBarTitle);
   }
 }
 
-class TodoDetailState extends State<TodoDetail> {
+class WeeklyDetailState extends State<WeeklyDetail> {
 
 	//static var _priorities = ['High', 'Low'];
 
-	DatabaseHelper helper = DatabaseHelper();
+	weeklyDBHelper helper = weeklyDBHelper();
 
 	String appBarTitle;
-	Todo todo;
+	Weekly todo;
 
 	TextEditingController titleController = TextEditingController();
 	TextEditingController descriptionController = TextEditingController();
 
-	TodoDetailState(this.todo, this.appBarTitle);
+	WeeklyDetailState(this.todo, this.appBarTitle);
 
 	@override
   Widget build(BuildContext context) {
@@ -50,7 +49,7 @@ class TodoDetailState extends State<TodoDetail> {
 
 	    child: Scaffold(
 	    appBar: AppBar(
-		    title: Text(appBarTitle),
+		    title: Text("Weekly"),
 		    leading: IconButton(icon: Icon(
 				    Icons.arrow_back),
 				    onPressed: () {

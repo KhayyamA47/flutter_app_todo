@@ -1,26 +1,27 @@
-import 'package:flutter_app_todo/Models/todo.dart';
+import 'package:flutter_app_todo/Models/dailyTodo.dart';
+import 'package:flutter_app_todo/Models/weeklyTodo.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
-class DatabaseHelper {
+class weeklyDBHelper {
 
-	static DatabaseHelper _databaseHelper;    // Singleton DatabaseHelper
+	static weeklyDBHelper _databaseHelper;    // Singleton DatabaseHelper
 	static Database _database;                // Singleton Database
 
-	String todoTable = 'todo_table';
+	String todoTable = 'weekly_table';
 	String colId = 'id';
 	String colTitle = 'title';
 	String colDescription = 'description';
 	String colDate = 'date';
 
-	DatabaseHelper._createInstance(); // Named constructor to create instance of DatabaseHelper
+	weeklyDBHelper._createInstance(); // Named constructor to create instance of DatabaseHelper
 
-	factory DatabaseHelper() {
+	factory weeklyDBHelper() {
 
 		if (_databaseHelper == null) {
-			_databaseHelper = DatabaseHelper._createInstance(); // This is executed only once, singleton object
+			_databaseHelper = weeklyDBHelper._createInstance(); // This is executed only once, singleton object
 		}
 		return _databaseHelper;
 	}
@@ -59,20 +60,20 @@ class DatabaseHelper {
 	}
 
 	// Insert Operation: Insert a todo object to database
-	Future<int> insertTodo(Todo todo) async {
+	Future<int> insertTodo(Weekly todo) async {
 		Database db = await this.database;
 		var result = await db.insert(todoTable, todo.toMap());
 		return result;
 	}
 
 	// Update Operation: Update a todo object and save it to database
-	Future<int> updateTodo(Todo todo) async {
+	Future<int> updateTodo(Weekly todo) async {
 		var db = await this.database;
 		var result = await db.update(todoTable, todo.toMap(), where: '$colId = ?', whereArgs: [todo.id]);
 		return result;
 	}
 
-  	Future<int> updateTodoCompleted(Todo todo) async {
+  	Future<int> updateTodoCompleted(Weekly todo) async {
 		var db = await this.database;
 		var result = await db.update(todoTable, todo.toMap(), where: '$colId = ?', whereArgs: [todo.id]);
 		return result;
@@ -94,15 +95,15 @@ class DatabaseHelper {
 	}
 
 	// Get the 'Map List' [ List<Map> ] and convert it to 'todo List' [ List<Todo> ]
-	Future<List<Todo>> getTodoList() async {
+	Future<List<Weekly>> getTodoList() async {
 
 		var todoMapList = await getTodoMapList(); // Get 'Map List' from database
 		int count = todoMapList.length;         // Count the number of map entries in db table
 
-		List<Todo> todoList = List<Todo>();
+		List<Weekly> todoList = List<Weekly>();
 		// For loop to create a 'todo List' from a 'Map List'
 		for (int i = 0; i < count; i++) {
-			todoList.add(Todo.fromMapObject(todoMapList[i]));
+			todoList.add(Weekly.fromMapObject(todoMapList[i]));
 		}
 
 		return todoList;

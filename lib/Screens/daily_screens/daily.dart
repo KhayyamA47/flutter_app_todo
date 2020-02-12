@@ -1,8 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_todo/Models/todo.dart';
-import 'package:flutter_app_todo/Screens/todo_detail.dart';
-import 'package:flutter_app_todo/Utils/database_helper.dart';
+import 'package:flutter_app_todo/Models/dailyTodo.dart';
+import 'package:flutter_app_todo/Models/weeklyTodo.dart';
+import 'package:flutter_app_todo/Models/weeklyTodo.dart';
+import 'package:flutter_app_todo/Models/weeklyTodo.dart';
+import 'package:flutter_app_todo/Screens/daily_screens/daily_detail.dart';
+import 'package:flutter_app_todo/Screens/weekly_screens/weekly.dart';
+import 'package:flutter_app_todo/Utils/daily_database_helper.dart';
+import 'package:flutter_app_todo/Utils/weekly_database_helper.dart';
 
 import 'package:sqflite/sqflite.dart';
 void main() {
@@ -20,26 +25,35 @@ class TodoApp extends StatelessWidget {
       theme: ThemeData(
           primarySwatch: Colors.blue
       ),
-      home: TodoList(),
+      home: DailyList(),
     );
   }
 }
-class TodoList extends StatefulWidget {
+class DailyList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     return TodoListState();
   }
 }
 
-class TodoListState extends State<TodoList> {
-  DatabaseHelper databaseHelper = DatabaseHelper();
-  List<Todo> todoList;
+class TodoListState extends State<DailyList> {
+  dailyDBHelper databaseHelper = dailyDBHelper();
+  List<Daily> todoList;
   int count = 0;
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
+    double width=MediaQuery.of(context).size.width;
+    double height=MediaQuery.of(context).size.height;
+
+    print('DAILY');
+
     if (todoList == null) {
-      todoList = List<Todo>();
+      todoList = List<Daily>();
       updateListView();
     }
 
@@ -47,11 +61,60 @@ class TodoListState extends State<TodoList> {
       appBar: AppBar(
         title: Text('Todos'),
       ),
-      body: getTodoListView(),
+      body:Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Container(
+                width: width/4,
+                child: RaisedButton(
+                  color: Colors.red,
+                  child: Text('Daily'),
+                  onPressed: (){
+
+
+
+
+
+                  },
+                ),
+              ),
+              Container(
+                width: width/4,
+                child: RaisedButton(
+                  color: Colors.red,
+                  child: Text('Weekly'),
+                  onPressed: (){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => WeeklyList()),
+                    );
+                  },
+                ),
+              ),
+              Container(
+                width: width/4,
+                child: RaisedButton(
+                  color: Colors.red,
+                  child: Text('Monthly'),
+                  onPressed: (){
+                  },
+                ),
+              ),
+            ],
+          ),
+
+
+          getTodoListView(),
+
+        ],
+      ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
-          navigateToDetail(Todo('', '', ''), 'Add Todo');
+          navigateToDetail(Daily('', '', ''), 'Add Todo');
         },
         tooltip: 'Add Todo',
         child: Icon(Icons.add),
@@ -61,6 +124,8 @@ class TodoListState extends State<TodoList> {
 
   ListView getTodoListView() {
     return ListView.builder(
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
       itemCount: count,
       itemBuilder: (BuildContext context, int position) {
         return Card(
@@ -97,40 +162,40 @@ class TodoListState extends State<TodoList> {
   }
 
    //Returns the priority color
-   Color getPriorityColor(int priority) {
-   	switch (priority) {
-   		case 1:
-   			return Colors.red;
-   			break;
-   		case 2:
-   			return Colors.yellow;
-   			break;
-
-   		default:
-   			return Colors.yellow;
-   	}
-   }
+//   Color getPriorityColor(int priority) {
+//   	switch (priority) {
+//   		case 1:
+//   			return Colors.red;
+//   			break;
+//   		case 2:
+//   			return Colors.yellow;
+//   			break;
+//
+//   		default:
+//   			return Colors.yellow;
+//   	}
+//   }
   getFirstLetter(String title) {
     return title.substring(0, 2);
   }
 
  
-  // Returns the priority icon
-   Icon getPriorityIcon(int priority) {
-   	switch (priority) {
-   		case 1:
-   			return Icon(Icons.play_arrow);
-   			break;
-   		case 2:
-   			return Icon(Icons.keyboard_arrow_right);
-   			break;
+//  // Returns the priority icon
+//   Icon getPriorityIcon(int priority) {
+//   	switch (priority) {
+//   		case 1:
+//   			return Icon(Icons.play_arrow);
+//   			break;
+//   		case 2:
+//   			return Icon(Icons.keyboard_arrow_right);
+//   			break;
+//
+//   		default:
+//   			return Icon(Icons.keyboard_arrow_right);
+//   	}
+//   }
 
-   		default:
-   			return Icon(Icons.keyboard_arrow_right);
-   	}
-   }
-
-  void _delete(BuildContext context, Todo todo) async {
+  void _delete(BuildContext context, Daily todo) async {
     int result = await databaseHelper.deleteTodo(todo.id);
     if (result != 0) {
       _showSnackBar(context, 'Todo Deleted Successfully');
@@ -143,7 +208,7 @@ class TodoListState extends State<TodoList> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void navigateToDetail(Todo todo, String title) async {
+  void navigateToDetail(Daily todo, String title) async {
     bool result =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return TodoDetail(todo, title);
@@ -157,7 +222,7 @@ class TodoListState extends State<TodoList> {
   void updateListView() {
     final Future<Database> dbFuture = databaseHelper.initializeDatabase();
     dbFuture.then((database) {
-      Future<List<Todo>> todoListFuture = databaseHelper.getTodoList();
+      Future<List<Daily>> todoListFuture = databaseHelper.getTodoList();
       todoListFuture.then((todoList) {
         setState(() {
           this.todoList = todoList;

@@ -1,14 +1,15 @@
 
-class Todo {
+// ignore: camel_case_types
+class Weekly {
 
 	int _id;
 	String _title;
 	String _description;
 	String _date;
 
-	Todo(this._title, this._date, [this._description] );
+	Weekly(this._title, this._date, [this._description] );
 
-	Todo.withId(this._id, this._title, this._date, [this._description]);
+	Weekly.withId(this._id, this._title, this._date, [this._description]);
 
 	int get id => _id;
 
@@ -49,7 +50,7 @@ class Todo {
 	}
 
 	// Extract a Note object from a Map object
-	Todo.fromMapObject(Map<String, dynamic> map) {
+	Weekly.fromMapObject(Map<String, dynamic> map) {
 		this._id = map['id'];
 		this._title = map['title'];
 		this._description = map['description'];
