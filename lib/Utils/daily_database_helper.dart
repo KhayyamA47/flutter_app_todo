@@ -13,7 +13,9 @@ class dailyDBHelper {
 	String colId = 'id';
 	String colTitle = 'title';
 	String colDescription = 'description';
+	String period = 'period';
 	String colDate = 'date';
+
 
 	dailyDBHelper._createInstance(); // Named constructor to create instance of DatabaseHelper
 
@@ -45,7 +47,7 @@ class dailyDBHelper {
 
 	void _createDb(Database db, int newVersion) async {
 
-		await db.execute('CREATE TABLE $todoTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, '
+		await db.execute('CREATE TABLE $todoTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $period TEXT,'
 				'$colDescription TEXT, $colDate TEXT)');
 	}
 
@@ -62,6 +64,7 @@ class dailyDBHelper {
 	Future<int> insertTodo(Daily todo) async {
 		Database db = await this.database;
 		var result = await db.insert(todoTable, todo.toMap());
+		print(todo.toMap());
 		return result;
 	}
 

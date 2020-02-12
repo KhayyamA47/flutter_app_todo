@@ -1,34 +1,26 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_todo/Models/dailyTodo.dart';
-import 'package:flutter_app_todo/Models/weeklyTodo.dart';
-import 'package:flutter_app_todo/Models/weeklyTodo.dart';
-import 'package:flutter_app_todo/Models/weeklyTodo.dart';
 import 'package:flutter_app_todo/Screens/daily_screens/daily_detail.dart';
-import 'package:flutter_app_todo/Screens/weekly_screens/weekly.dart';
 import 'package:flutter_app_todo/Utils/daily_database_helper.dart';
-import 'package:flutter_app_todo/Utils/weekly_database_helper.dart';
-
 import 'package:sqflite/sqflite.dart';
+
 void main() {
   runApp(TodoApp());
 }
 
 class TodoApp extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'TodoList',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          primarySwatch: Colors.blue
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: DailyList(),
     );
   }
 }
+
 class DailyList extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -41,16 +33,10 @@ class TodoListState extends State<DailyList> {
   List<Daily> todoList;
   int count = 0;
 
-
-
-
-
   @override
   Widget build(BuildContext context) {
-    double width=MediaQuery.of(context).size.width;
-    double height=MediaQuery.of(context).size.height;
-
-    print('DAILY');
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
 
     if (todoList == null) {
       todoList = List<Daily>();
@@ -61,56 +47,45 @@ class TodoListState extends State<DailyList> {
       appBar: AppBar(
         title: Text('Todos'),
       ),
-      body:Column(
+      body: Column(
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Container(
-                width: width/4,
+                width: width / 4,
                 child: RaisedButton(
                   color: Colors.red,
                   child: Text('Daily'),
-                  onPressed: (){
-
-
-
-
-
-                  },
+                  onPressed: () {},
                 ),
               ),
               Container(
-                width: width/4,
+                width: width / 4,
                 child: RaisedButton(
                   color: Colors.red,
                   child: Text('Weekly'),
-                  onPressed: (){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => WeeklyList()),
-                    );
+                  onPressed: () {
+//                    Navigator.push(
+//                      context,
+//                      MaterialPageRoute(builder: (context) => WeeklyList()),
+//                    );
                   },
                 ),
               ),
               Container(
-                width: width/4,
+                width: width / 4,
                 child: RaisedButton(
                   color: Colors.red,
                   child: Text('Monthly'),
-                  onPressed: (){
-                  },
+                  onPressed: () {},
                 ),
               ),
             ],
           ),
-
-
           getTodoListView(),
-
         ],
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
@@ -134,17 +109,18 @@ class TodoListState extends State<DailyList> {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: Colors.amber,
-              child: Text(getFirstLetter(this.todoList[position].title),
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
             ),
-            title: Text(this.todoList[position].title,
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            title: Text(this.todoList[position].title, style: TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(this.todoList[position].description),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 GestureDetector(
-                  child: Icon(Icons.delete,color: Colors.red,),
+                  child: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
                   onTap: () {
                     _delete(context, todoList[position]);
                   },
@@ -161,7 +137,7 @@ class TodoListState extends State<DailyList> {
     );
   }
 
-   //Returns the priority color
+  //Returns the priority color
 //   Color getPriorityColor(int priority) {
 //   	switch (priority) {
 //   		case 1:
@@ -176,10 +152,9 @@ class TodoListState extends State<DailyList> {
 //   	}
 //   }
   getFirstLetter(String title) {
-    return title.substring(0, 2);
+    return title.substring(0, 1);
   }
 
- 
 //  // Returns the priority icon
 //   Icon getPriorityIcon(int priority) {
 //   	switch (priority) {
@@ -209,8 +184,7 @@ class TodoListState extends State<DailyList> {
   }
 
   void navigateToDetail(Daily todo, String title) async {
-    bool result =
-        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+    bool result = await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return TodoDetail(todo, title);
     }));
 
@@ -226,11 +200,10 @@ class TodoListState extends State<DailyList> {
       todoListFuture.then((todoList) {
         setState(() {
           this.todoList = todoList;
+          print('todo list ; $todoList');
           this.count = todoList.length;
         });
       });
     });
   }
-
-  
 }

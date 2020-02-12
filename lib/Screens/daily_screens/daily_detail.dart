@@ -27,10 +27,12 @@ class TodoDetailState extends State<TodoDetail> {
 
 	String appBarTitle;
 	Daily todo;
-
+String period;
 	TextEditingController titleController = TextEditingController();
 	TextEditingController descriptionController = TextEditingController();
-
+  String value = '';
+  String dropdownValue = 'Daily';
+  List<String> spinnerItems = ['Daily','Weekly','Monthly'];
 	TodoDetailState(this.todo, this.appBarTitle);
 
 	@override
@@ -127,7 +129,37 @@ class TodoDetailState extends State<TodoDetail> {
 						    ),
 					    ),
 				    ),
-
+            Padding(
+              padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+              child: DropdownButtonHideUnderline(
+                  child: ButtonTheme(
+                    alignedDropdown: true,
+                    child: DropdownButton<String>(
+                      value: dropdownValue,
+                      icon: Icon(Icons.arrow_drop_down),
+                      iconSize: 24,
+                      elevation: 16,
+                      style: TextStyle(color: Colors.black, fontSize: 18.0),
+                      underline: Container(
+                        width: 100.0,
+                        height: 2,
+                        color: Colors.deepPurpleAccent,
+                      ),
+                      onChanged: (String data) {
+                        setState(() {
+                          dropdownValue = data;
+                          print('dropdownValue : $dropdownValue');
+                        });
+                      },
+                      items: spinnerItems.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value,style: TextStyle(color: Colors.black, fontSize: 13)),
+                        );
+                      }).toList(),
+                    ),
+                  ))
+            ),
 				    // Fourth Element
 				    Padding(
 					    padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
@@ -227,6 +259,8 @@ class TodoDetailState extends State<TodoDetail> {
 		moveToLastScreen();
 
 		todo.date = DateFormat.yMMMd().format(DateTime.now());
+		todo.period = dropdownValue; //todo get from input
+    print('period ${todo.period}');
 		int result;
 		if (todo.id != null) {  // Case 1: Update operation
 			result = await helper.updateTodo(todo);
