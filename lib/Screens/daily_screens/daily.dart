@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_todo/Models/dailyTodo.dart';
 import 'package:flutter_app_todo/Screens/daily_screens/daily_detail.dart';
@@ -38,8 +39,14 @@ class TodoListState extends State<DailyList> {
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery
+        .of(context)
+        .size
+        .width;
+    double height = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     if (todoList == null) {
       todoList = List<Daily>();
@@ -83,7 +90,9 @@ class TodoListState extends State<DailyList> {
 
     final date2 = DateTime.now();
 
-    int diffTime = d.difference(date2).inMinutes;
+    int diffTime = d
+        .difference(date2)
+        .inMinutes;
     bool isSame = (diffTime > 0);
     return isSame;
   }
@@ -94,63 +103,66 @@ class TodoListState extends State<DailyList> {
       children: <Widget>[
 
         Container(
-          margin: EdgeInsets.only(left: 8.0,right: 8.0),
-          child:  CircleAvatar(
+          margin: EdgeInsets.only(left: 8.0, right: 8.0),
+          child: CircleAvatar(
             backgroundColor: getPriorityColor(this.todoList[position].priority),
-            child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
           ),
         ),
 
         Flexible(
             child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Flexible(
-                child: Container(
-              margin: EdgeInsets.only( right: 10.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Flexible(
-                    child: Text(
-                      this.todoList[position].title,
-                      style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold, decoration: TextDecoration.lineThrough, decorationThickness: 3.0),
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                      maxLines: 2,
-                    ),
-                  ),
-                  Flexible(
-                      child: Container(
-                    child: Text(
-                      this.todoList[position].description,
-                      overflow: TextOverflow.ellipsis,
-                      softWrap: false,
-                      maxLines: 2,
-                    ),
-                  ))
-                ],
-              ),
-            )),
-            Container(
-              margin: EdgeInsets.only(right: 8.0),
-                alignment: Alignment.bottomRight,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Text(
-                      getDate(this.todoList[position].date),
-                      style: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic),
-                    ),
-                    Text(
-                      getTime(this.todoList[position].date),
-                      style: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic),
-                    ),
-                  ],
-                ))
-          ],
-        ))
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flexible(
+                    child: Container(
+                      margin: EdgeInsets.only(right: 10.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Flexible(
+                            child: Text(
+                              this.todoList[position].title,
+                              style: TextStyle(fontSize: 19.0, fontWeight: FontWeight.bold, decoration: !checkTime(this.todoList[position].date)
+                                  ? TextDecoration.lineThrough : TextDecoration.none, decorationThickness: 2.5),
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                              maxLines: 2,
+                            ),
+                          ),
+                          Flexible(
+                              child: Container(
+                                child: Text(
+                                  this.todoList[position].description, style: TextStyle(
+                                    fontSize: 12.0, fontStyle: FontStyle.italic, decoration: !checkTime(this.todoList[position].date)
+                                    ? TextDecoration.lineThrough : TextDecoration.none, decorationThickness: 1.5
+                                ),
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: false,
+                                  maxLines: 2,
+                                ),
+                              ))
+                        ],
+                      ),
+                    )),
+                Container(
+                    margin: EdgeInsets.only(right: 8.0),
+                    alignment: Alignment.bottomRight,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Text(
+                          getDate(this.todoList[position].date),
+                          style: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic),
+                        ),
+                        Text(
+                          getTime(this.todoList[position].date),
+                          style: TextStyle(fontSize: 12.0, fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    ))
+              ],
+            ))
       ],
     );
   }
@@ -164,16 +176,21 @@ class TodoListState extends State<DailyList> {
         return Slidable(
           actionPane: SlidableDrawerActionPane(),
           actionExtentRatio: 0.25,
-          child: Container(height: 80.0, child: Card(elevation: 3.0, color: Colors.white, child: listViewItems(position))),
+
+          child: Container(height: 80.0,
+              child: Card(elevation: 3.0,
+                  color: !checkTime(this.todoList[position].date) ? Colors.blueGrey.withOpacity(0.46) : Colors.white,
+                  child: listViewItems(position))),
           actions: <Widget>[
-            IconSlideAction(
+            checkTime(this.todoList[position].date) ? IconSlideAction(
               caption: 'Update',
               color: Colors.indigo,
               icon: Icons.update,
               onTap: () {
                 navigateToDetail(this.todoList[position], 'Edit Todo');
               },
-            ),
+            ) :null
+
           ],
           secondaryActions: <Widget>[
             IconSlideAction(
