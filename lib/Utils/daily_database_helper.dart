@@ -14,6 +14,7 @@ class dailyDBHelper {
 	String colTitle = 'title';
 	String colDescription = 'description';
 	String period = 'period';
+	String priority = 'priority';
 	String colDate = 'date';
 
 
@@ -47,7 +48,7 @@ class dailyDBHelper {
 
 	void _createDb(Database db, int newVersion) async {
 
-		await db.execute('CREATE TABLE $todoTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $period TEXT,'
+		await db.execute('CREATE TABLE $todoTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $period TEXT,$priority TEXT,'
 				'$colDescription TEXT, $colDate TEXT)');
 	}
 

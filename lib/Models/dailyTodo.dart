@@ -1,81 +1,76 @@
-
 // ignore: camel_case_types
 class Daily {
+  int _id;
 
-	int _id;
+  String _title;
+  String _period;
+  String _priority;
+  String _description;
+  String _date;
 
-	String _title;
-	String _period;
+  Daily(this._title, this._period, this._priority, this._date, [this._description]);
 
-	String _description;
-	String _date;
+  Daily.withId(this._id, this._title, this._period, this._priority, this._date, [this._description]);
 
-	Daily(this._title, this._period,this._date, [this._description]);
+  int get id => _id;
 
-	Daily.withId(this._id, this._title, this._period, this._date, [this._description]);
+  String get title => _title;
 
-	int get id => _id;
+  String get period => _period;
 
-	String get title => _title;
-	String get  period => _period;
+  String get priority => _priority;
 
-	String get description => _description;
+  String get description => _description;
 
-	String get date => _date;
+  String get date => _date;
 
+  set title(String newTitle) {
+    if (newTitle.length <= 255) {
+      this._title = newTitle;
+    }
+  }
 
-	set title(String newTitle) {
-		if (newTitle.length <= 255) {
-			this._title = newTitle;
-		}
-	}
-	set period(String period) {
-		//todo check if valui is acceptable
-		this._period = period;
-	}
-	set description(String newDescription) {
-		if (newDescription.length <= 255) {
-			this._description = newDescription;
-		}
-	}
+  set period(String period) {
+    //todo check if valui is acceptable
+    this._period = period;
+  }
 
-	set date(String newDate) {
-		this._date = newDate;
-	}
+  set priority(String priority) {
+    this._priority = priority;
+  }
 
-	// Convert a Note object into a Map object
-	Map<String, dynamic> toMap() {
+  set description(String newDescription) {
+    if (newDescription.length <= 255) {
+      this._description = newDescription;
+    }
+  }
 
-		var map = Map<String, dynamic>();
-		if (id != null) {
-			map['id'] = _id;
-		}
-		map['title'] = _title;
-		map['period'] = _period;
-		map['description'] = _description;
-		map['date'] = _date;
+  set date(String newDate) {
+    this._date = newDate;
+  }
 
-		return map;
-	}
+  // Convert a Note object into a Map object
+  Map<String, dynamic> toMap() {
+    var map = Map<String, dynamic>();
+    if (id != null) {
+      map['id'] = _id;
+    }
+    map['title'] = _title;
+    map['period'] = _period;
+    map['priority'] = _priority;
+    map['description'] = _description;
+    map['date'] = _date;
 
-	// Extract a Note object from a Map object
-	Daily.fromMapObject(Map<String, dynamic> map) {
-		this._id = map['id'];
-		this._title = map['title'];
-		this._period = map['period'];
-		this._description = map['description'];
-		this._date = map['date'];
-	}
+    return map;
+  }
 
-
-
+  // Extract a Note object from a Map object
+  Daily.fromMapObject(Map<String, dynamic> map) {
+    this._id = map['id'];
+    this._title = map['title'];
+    this._period = map['period'];
+    this._priority = map['priority'];
+    this._description = map['description'];
+    this._date = map['date'];
+  }
 }
-
-
-
-
-
-
-
-
-

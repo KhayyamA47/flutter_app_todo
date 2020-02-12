@@ -4,6 +4,7 @@ import 'package:flutter_app_todo/Models/dailyTodo.dart';
 import 'package:flutter_app_todo/Screens/daily_screens/daily_detail.dart';
 import 'package:flutter_app_todo/Utils/daily_database_helper.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 void main() {
   runApp(TodoApp());
@@ -49,47 +50,13 @@ class TodoListState extends State<DailyList> {
       ),
       body: Column(
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Container(
-                width: width / 4,
-                child: RaisedButton(
-                  color: Colors.red,
-                  child: Text('Daily'),
-                  onPressed: () {},
-                ),
-              ),
-              Container(
-                width: width / 4,
-                child: RaisedButton(
-                  color: Colors.red,
-                  child: Text('Weekly'),
-                  onPressed: () {
-//                    Navigator.push(
-//                      context,
-//                      MaterialPageRoute(builder: (context) => WeeklyList()),
-//                    );
-                  },
-                ),
-              ),
-              Container(
-                width: width / 4,
-                child: RaisedButton(
-                  color: Colors.red,
-                  child: Text('Monthly'),
-                  onPressed: () {},
-                ),
-              ),
-            ],
-          ),
           getTodoListView(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
-          navigateToDetail(Daily('', '', ''), 'Add Todo');
+          navigateToDetail(Daily('', '', '', ''), 'Add Todo');
         },
         tooltip: 'Add Todo',
         child: Icon(Icons.add),
@@ -97,78 +64,74 @@ class TodoListState extends State<DailyList> {
     );
   }
 
-  ListView getTodoListView() {
+  getTodoListView() {
     return ListView.builder(
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       itemCount: count,
       itemBuilder: (BuildContext context, int position) {
-        return Card(
-          color: Colors.white,
-          elevation: 2.0,
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor: Colors.amber,
-              child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
+        return Slidable(
+          actionPane: SlidableDrawerActionPane(),
+          actionExtentRatio: 0.25,
+          child: Card(
+            elevation: 3.0,
+            color: Colors.white,
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundColor: getPriorityColor(this.todoList[position].priority),
+                child: Text(getFirstLetter(this.todoList[position].period), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0)),
+              ),
+              title: Text(this.todoList[position].title, style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(this.todoList[position].description),
+
             ),
-            title: Text(this.todoList[position].title, style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: Text(this.todoList[position].description),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                GestureDetector(
-                  child: Icon(
-                    Icons.delete,
-                    color: Colors.red,
-                  ),
-                  onTap: () {
-                    _delete(context, todoList[position]);
-                  },
-                ),
-              ],
-            ),
-            onTap: () {
-              debugPrint("ListTile Tapped");
-              navigateToDetail(this.todoList[position], 'Edit Todo');
-            },
           ),
+          actions: <Widget>[
+            IconSlideAction(
+              caption: 'Update',
+              color: Colors.indigo,
+              icon: Icons.update,
+              onTap: ()  {
+                navigateToDetail(this.todoList[position], 'Edit Todo');
+              },
+            ),
+          ],
+          secondaryActions: <Widget>[
+            IconSlideAction(
+              caption: 'Delete',
+              color: Colors.red,
+              icon: Icons.delete,
+              onTap:  () {
+                _delete(context, todoList[position]);
+              },
+            ),
+          ],
         );
       },
     );
   }
 
   //Returns the priority color
-//   Color getPriorityColor(int priority) {
-//   	switch (priority) {
-//   		case 1:
-//   			return Colors.red;
-//   			break;
-//   		case 2:
-//   			return Colors.yellow;
-//   			break;
-//
-//   		default:
-//   			return Colors.yellow;
-//   	}
-//   }
+  Color getPriorityColor(String color) {
+    switch (color) {
+      case 'Low':
+        return Colors.blue;
+        break;
+      case 'Medium':
+        return Colors.yellow;
+        break;
+      case 'High':
+        return Colors.red;
+        break;
+
+      default:
+        return Colors.blue;
+    }
+  }
+
   getFirstLetter(String title) {
     return title.substring(0, 1);
   }
-
-//  // Returns the priority icon
-//   Icon getPriorityIcon(int priority) {
-//   	switch (priority) {
-//   		case 1:
-//   			return Icon(Icons.play_arrow);
-//   			break;
-//   		case 2:
-//   			return Icon(Icons.keyboard_arrow_right);
-//   			break;
-//
-//   		default:
-//   			return Icon(Icons.keyboard_arrow_right);
-//   	}
-//   }
 
   void _delete(BuildContext context, Daily todo) async {
     int result = await databaseHelper.deleteTodo(todo.id);
@@ -205,5 +168,92 @@ class TodoListState extends State<DailyList> {
         });
       });
     });
+  }
+}
+
+class SlideMenu extends StatefulWidget {
+  final Widget child;
+  final List<Widget> menuItems;
+
+  SlideMenu({this.child, this.menuItems});
+
+  @override
+  _SlideMenuState createState() => new _SlideMenuState();
+}
+
+class _SlideMenuState extends State<SlideMenu> with SingleTickerProviderStateMixin {
+  AnimationController _controller;
+
+  @override
+  initState() {
+    super.initState();
+    _controller = new AnimationController(vsync: this, duration: const Duration(milliseconds: 200));
+  }
+
+  @override
+  dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final animation =
+        new Tween(begin: const Offset(0.0, 0.0), end: const Offset(-0.2, 0.0)).animate(new CurveTween(curve: Curves.decelerate).animate(_controller));
+
+    return new GestureDetector(
+      onHorizontalDragUpdate: (data) {
+        // we can access context.size here
+        setState(() {
+          _controller.value -= data.primaryDelta / context.size.width;
+        });
+      },
+      onHorizontalDragEnd: (data) {
+        if (data.primaryVelocity > 2500)
+          _controller.animateTo(.0);
+        else if (_controller.value >= .5 || data.primaryVelocity < -2500)
+          _controller.animateTo(1.0);
+        else
+          _controller.animateTo(.0);
+      },
+      child: new Stack(
+        children: <Widget>[
+          new SlideTransition(position: animation, child: widget.child),
+          new Positioned.fill(
+            child: new LayoutBuilder(
+              builder: (context, constraint) {
+                return new AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, child) {
+                    return new Stack(
+                      children: <Widget>[
+                        new Positioned(
+                          right: .0,
+                          top: .0,
+                          bottom: .0,
+                          width: constraint.maxWidth * animation.value.dx * -2,
+                          child: new Container(
+                            margin: EdgeInsets.only(top: 8.0),
+                            height: MediaQuery.of(context).size.height / 10,
+                            color: Colors.white,
+                            child: new Row(
+                              children: widget.menuItems.map((child) {
+                                return new Expanded(
+                                  child: child,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+          )
+        ],
+      ),
+    );
   }
 }

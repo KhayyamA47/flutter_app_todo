@@ -30,9 +30,10 @@ class TodoDetailState extends State<TodoDetail> {
 String period;
 	TextEditingController titleController = TextEditingController();
 	TextEditingController descriptionController = TextEditingController();
-  String value = '';
-  String dropdownValue = 'Daily';
-  List<String> spinnerItems = ['Daily','Weekly','Monthly'];
+  String periodValue = 'Daily';
+  List<String> periodItems = ['Daily','Weekly','Monthly'];
+	String priorityValue = 'Low';
+	List<String> priorityItems = ['Low','Medium','High'];
 	TodoDetailState(this.todo, this.appBarTitle);
 
 	@override
@@ -135,7 +136,7 @@ String period;
                   child: ButtonTheme(
                     alignedDropdown: true,
                     child: DropdownButton<String>(
-                      value: dropdownValue,
+                      value: periodValue,
                       icon: Icon(Icons.arrow_drop_down),
                       iconSize: 24,
                       elevation: 16,
@@ -147,11 +148,11 @@ String period;
                       ),
                       onChanged: (String data) {
                         setState(() {
-                          dropdownValue = data;
-                          print('dropdownValue : $dropdownValue');
+                          periodValue = data;
+                          print('dropdownValue : $periodValue');
                         });
                       },
-                      items: spinnerItems.map<DropdownMenuItem<String>>((String value) {
+                      items: periodItems.map<DropdownMenuItem<String>>((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value,style: TextStyle(color: Colors.black, fontSize: 13)),
@@ -160,6 +161,37 @@ String period;
                     ),
                   ))
             ),
+						Padding(
+								padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
+								child: DropdownButtonHideUnderline(
+										child: ButtonTheme(
+											alignedDropdown: true,
+											child: DropdownButton<String>(
+												value: priorityValue,
+												icon: Icon(Icons.arrow_drop_down),
+												iconSize: 24,
+												elevation: 16,
+												style: TextStyle(color: Colors.black, fontSize: 18.0),
+												underline: Container(
+													width: 100.0,
+													height: 2,
+													color: Colors.deepPurpleAccent,
+												),
+												onChanged: (String data) {
+													setState(() {
+														priorityValue = data;
+														print('dropdownValue : $priorityValue');
+													});
+												},
+												items: priorityItems.map<DropdownMenuItem<String>>((String value) {
+													return DropdownMenuItem<String>(
+														value: value,
+														child: Text(value,style: TextStyle(color: Colors.black, fontSize: 13)),
+													);
+												}).toList(),
+											),
+										))
+						),
 				    // Fourth Element
 				    Padding(
 					    padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
@@ -217,31 +249,6 @@ String period;
 		Navigator.pop(context, true);
   }
 
-	// Convert the String priority in the form of integer before saving it to Database
-	// void updatePriorityAsInt(String value) {
-	// 	switch (value) {
-	// 		case 'High':
-	// 			todo.priority = 1;
-	// 			break;
-	// 		case 'Low':
-	// 			todo.priority = 2;
-	// 			break;
-	// 	}
-	// }
-
-	// Convert int priority to String priority and display it to user in DropDown
-	// String getPriorityAsString(int value) {
-	// 	String priority;
-	// 	switch (value) {
-	// 		case 1:
-	// 			priority = _priorities[0];  // 'High'
-	// 			break;
-	// 		case 2:
-	// 			priority = _priorities[1];  // 'Low'
-	// 			break;
-	// 	}
-	// 	return priority;
-	// }
 
 	// Update the title of todo object
   void updateTitle(){
@@ -259,8 +266,9 @@ String period;
 		moveToLastScreen();
 
 		todo.date = DateFormat.yMMMd().format(DateTime.now());
-		todo.period = dropdownValue; //todo get from input
-    print('period ${todo.period}');
+		todo.period = periodValue;
+		todo.priority = priorityValue;
+    print('period ${todo.priority}');
 		int result;
 		if (todo.id != null) {  // Case 1: Update operation
 			result = await helper.updateTodo(todo);
