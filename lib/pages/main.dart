@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_todo/Models/dailyTodo.dart';
-import 'package:flutter_app_todo/dbHelper/daily_database_helper.dart';
-import 'package:flutter_app_todo/pages/daily_detail.dart';
+import 'package:flutter_app_todo/Models/todo.dart';
+import 'package:flutter_app_todo/dbHelper/database_hepler.dart';
+import 'package:flutter_app_todo/pages/todo_detail.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';

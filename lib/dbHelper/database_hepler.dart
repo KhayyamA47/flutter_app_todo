@@ -1,4 +1,4 @@
-import 'package:flutter_app_todo/Models/dailyTodo.dart';
+import 'package:flutter_app_todo/Models/todo.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'dart:io';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app_todo/Models/dailyTodo.dart';
-import 'package:flutter_app_todo/dbHelper/daily_database_helper.dart';
+import 'package:flutter_app_todo/Models/todo.dart';
+import 'package:flutter_app_todo/dbHelper/database_hepler.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
