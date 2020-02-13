@@ -35,7 +35,6 @@ class TodoListState extends State<DailyList> {
   dailyDBHelper databaseHelper = dailyDBHelper();
   List<Todo> todoList;
   int count = 0;
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -86,11 +85,17 @@ class TodoListState extends State<DailyList> {
 
   Widget listViewItems(int position) {
     checkTime(this.todoList[position].date);
-    return Row(
+    return ListTile(
+onLongPress: (){
+
+  print('Long press');
+},
+        title:Row(
       children: <Widget>[
         Container(
-          margin: EdgeInsets.only(left: 8.0, right: 8.0),
+          margin: EdgeInsets.only(right: 8.0),
           child: CircleAvatar(
+
             backgroundColor: getPriorityColor(this.todoList[position].priority),
           ),
         ),
@@ -100,7 +105,6 @@ class TodoListState extends State<DailyList> {
           children: <Widget>[
             Flexible(
                 child: Container(
-              margin: EdgeInsets.only(right: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +140,7 @@ class TodoListState extends State<DailyList> {
               ),
             )),
             Container(
-                margin: EdgeInsets.only(right: 8.0),
+                margin: EdgeInsets.only(bottom: 8.0),
                 alignment: Alignment.bottomRight,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -154,7 +158,7 @@ class TodoListState extends State<DailyList> {
           ],
         ))
       ],
-    );
+    ));
   }
 
   getTodoListView() {
@@ -210,7 +214,6 @@ class TodoListState extends State<DailyList> {
       case 'High':
         return Colors.red;
         break;
-
       default:
         return Colors.blue;
     }
