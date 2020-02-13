@@ -1,17 +1,15 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_app_todo/Models/dailyTodo.dart';
-import 'package:flutter_app_todo/Utils/daily_database_helper.dart';
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:flutter_app_todo/dbHelper/daily_database_helper.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 
 class TodoDetail extends StatefulWidget {
   final String appBarTitle;
-  final Daily todo;
+  final Todo todo;
 
   TodoDetail(this.todo, this.appBarTitle);
 
@@ -22,17 +20,11 @@ class TodoDetail extends StatefulWidget {
 }
 
 class TodoDetailState extends State<TodoDetail> {
-  //static var _priorities = ['High', 'Low'];
-
   dailyDBHelper helper = dailyDBHelper();
-
   String appBarTitle;
-  Daily todo;
-  String period;
+  Todo todo;
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
-  String periodValue = 'Daily';
-  List<String> periodItems = ['Daily', 'Weekly', 'Monthly'];
   String priorityValue = 'Low';
   List<String> priorityItems = ['Low', 'Medium', 'High'];
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -48,7 +40,6 @@ class TodoDetailState extends State<TodoDetail> {
 
     return WillPopScope(
         onWillPop: () {
-          // Write some code to control things, when user press Back navigation button in device navigationBar
           moveToLastScreen();
         },
         child: Scaffold(
@@ -58,7 +49,6 @@ class TodoDetailState extends State<TodoDetail> {
             leading: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
-                  // Write some code to control things, when user press back button in AppBar
                   moveToLastScreen();
                 }),
           ),
@@ -66,31 +56,24 @@ class TodoDetailState extends State<TodoDetail> {
             padding: EdgeInsets.only(top: 15.0, left: 10.0, right: 10.0),
             child: ListView(
               children: <Widget>[
-                // First element
-
-                // Second Element
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: TextField(
                     controller: titleController,
                     style: textStyle,
                     onChanged: (value) {
-                      debugPrint('Something changed in Title Text Field');
                       updateTitle();
                     },
                     decoration:
                         InputDecoration(labelText: 'Title', labelStyle: textStyle, border: OutlineInputBorder(borderRadius: BorderRadius.circular(5.0))),
                   ),
                 ),
-
-                // Third Element
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: TextField(
                     controller: descriptionController,
                     style: textStyle,
                     onChanged: (value) {
-                      debugPrint('Something changed in Description Text Field');
                       updateDescription();
                     },
                     decoration:
@@ -117,7 +100,6 @@ class TodoDetailState extends State<TodoDetail> {
                         onChanged: (String data) {
                           setState(() {
                             priorityValue = data;
-                            print('dropdownValue : $priorityValue');
                           });
                         },
                         items: priorityItems.map<DropdownMenuItem<String>>((String value) {
@@ -128,7 +110,6 @@ class TodoDetailState extends State<TodoDetail> {
                         }).toList(),
                       ),
                     ))),
-                // Fourth Element
                 Padding(
                   padding: EdgeInsets.only(top: 15.0, bottom: 15.0),
                   child: Row(
@@ -143,18 +124,19 @@ class TodoDetailState extends State<TodoDetail> {
                           ),
                           onPressed: () {
                             setState(() {
-                              print(" button clicked ${titleController.text}");
-
                               if (titleController.text != null &&
                                   titleController.text != '' &&
                                   descriptionController.text != null &&
                                   descriptionController.text != '' &&
                                   BasicDateTimeField.resultTime != null &&
                                   BasicDateTimeField.resultTime != '') {
-                                print("Save button clicked");
-                                _save();
-                              }else{
-                                _displaySnackBar(context);
+                                if (checkTime(BasicDateTimeField.resultTime) == false) {
+                                  _displaySnackBar(context, 'Already passed');
+                                } else {
+                                  _save();
+                                }
+                              } else {
+                                _displaySnackBar(context, 'Please,fill all boxes');
                               }
                             });
                           },
@@ -173,7 +155,6 @@ class TodoDetailState extends State<TodoDetail> {
                           ),
                           onPressed: () {
                             setState(() {
-                              debugPrint("Delete button clicked");
                               _delete();
                             });
                           },
@@ -192,28 +173,24 @@ class TodoDetailState extends State<TodoDetail> {
     Navigator.pop(context, true);
   }
 
-  // Update the title of todo object
   void updateTitle() {
     todo.title = titleController.text;
   }
 
-  // Update the description of todo object
   void updateDescription() {
     todo.description = descriptionController.text;
   }
 
-  _displaySnackBar(BuildContext context) {
-    final snackBar = SnackBar(content: Text('Please,fill all boxes'));
+  _displaySnackBar(BuildContext context, String message) {
+    final snackBar = SnackBar(content: Text(message));
     _scaffoldKey.currentState.showSnackBar(snackBar);
   }
-  // Save data to database
+
   void _save() async {
     moveToLastScreen();
+    todo.date = Jiffy(BasicDateTimeField.resultTime).add(minutes: 2).toString();
 
-    todo.date = BasicDateTimeField.resultTime.toString();
-    todo.period = periodValue;
     todo.priority = priorityValue;
-    print('period ${todo.priority}');
     int result;
     if (todo.id != null) {
       // Case 1: Update operation
@@ -225,24 +202,45 @@ class TodoDetailState extends State<TodoDetail> {
 
     if (result != 0) {
       // Success
-      _showAlertDialog('Status', 'Todo Saved Successfully');
+      Fluttertoast.showToast(
+          msg: "Todo Saved Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
     } else {
       // Failure
-      _showAlertDialog('Status', 'Problem Saving Todo');
+      Fluttertoast.showToast(
+          msg: "Problem Saving Todo",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.black,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+  }
+
+  bool checkTime(DateTime date) {
+    if (date != null) {
+      final now = DateTime.now();
+      int diffTime = date.difference(now).inSeconds;
+      bool isSame = (diffTime > 0);
+      return isSame;
+    } else {
+      _displaySnackBar(context, 'Please,set date and time');
     }
   }
 
   void _delete() async {
     moveToLastScreen();
-
-    // Case 1: If user is trying to delete the NEW todo i.e. he has come to
-    // the detail page by pressing the FAB of todoList page.
     if (todo.id == null) {
       _showAlertDialog('Status', 'No Todo was deleted');
       return;
     }
 
-    // Case 2: User is trying to delete the old todo that already has a valid ID.
     int result = await helper.deleteTodo(todo.id);
     if (result != 0) {
       _showAlertDialog('Status', 'Todo Deleted Successfully');
@@ -280,13 +278,9 @@ class BasicDateTimeField extends StatelessWidget {
               context: context,
               initialTime: TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
             );
-
             resultTime = DateTimeField.combine(date, time);
-            print('time 1 ${DateTimeField.combine(date, time)}');
             return DateTimeField.combine(date, time);
           } else {
-            print('time 2 $currentValue}');
-
             return currentValue;
           }
         },

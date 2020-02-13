@@ -1,22 +1,20 @@
 // ignore: camel_case_types
-class Daily {
+class Todo {
   int _id;
 
   String _title;
-  String _period;
   String _priority;
   String _description;
   String _date;
 
-  Daily(this._title, this._period, this._priority, this._date, [this._description]);
+  Todo(this._title, this._priority, this._date, [this._description]);
 
-  Daily.withId(this._id, this._title, this._period, this._priority, this._date, [this._description]);
+  Todo.withId(this._id, this._title,  this._priority, this._date, [this._description]);
 
   int get id => _id;
 
   String get title => _title;
 
-  String get period => _period;
 
   String get priority => _priority;
 
@@ -30,10 +28,6 @@ class Daily {
     }
   }
 
-  set period(String period) {
-    //todo check if valui is acceptable
-    this._period = period;
-  }
 
   set priority(String priority) {
     this._priority = priority;
@@ -56,7 +50,6 @@ class Daily {
       map['id'] = _id;
     }
     map['title'] = _title;
-    map['period'] = _period;
     map['priority'] = _priority;
     map['description'] = _description;
     map['date'] = _date;
@@ -65,10 +58,9 @@ class Daily {
   }
 
   // Extract a Note object from a Map object
-  Daily.fromMapObject(Map<String, dynamic> map) {
+  Todo.fromMapObject(Map<String, dynamic> map) {
     this._id = map['id'];
     this._title = map['title'];
-    this._period = map['period'];
     this._priority = map['priority'];
     this._description = map['description'];
     this._date = map['date'];
